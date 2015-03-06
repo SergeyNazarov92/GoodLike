@@ -1,0 +1,289 @@
+{% extends 'main.html' %}
+{% load staticfiles %}
+
+
+{% block not_found %}
+        {% if not posts %}
+            {% if not selected_category and not selected_name_gift %}
+                <div class="large-10 columns small-centered">
+                    <hr>
+                    <h5>* Пожалуйста, выберите категорию приза.</h5>
+                </div>
+            {% else %}
+                <div class="large-10 columns small-centered">
+                    <hr>
+                    <h5>По вашему запросу не найдено ни одного конкурса.</h5>
+                </div>
+            {% endif %}
+        {% endif %}
+{% endblock %}
+
+{% block count_all %}
+    {{ count_all }}
+{% endblock %}
+
+{% block sub_search %}
+<div class="row" >
+    <div class="large-12 columns" >
+    <dl class="sub-nav" style="background: #f2f2f2; border: 1px solid #d8d8d8;">
+        <form id="search_form" method="post" action="/search/">
+        {% csrf_token %}
+        <div class="large-1 columns " >
+            <div class="large-12 columns ">
+                <img width="30px" src="{% static "static/img/vk_icon.jpg" %}">
+            </div>
+        </div>
+        <div class="large-2 columns " >
+            <div class="large-12 columns" >
+                <select required name="city" size="1" class="radius" oninvalid="this.setCustomValidity('Выберите город')" onchange="this.setCustomValidity('')">
+                        <option  value="">Выберите город:</option>
+                        {% for city in all_city %}
+                            <option value="{{ city.city_name }}"
+                                    {% if city.city_name == "По всей России" %}
+                                        style="font-weight:900"
+                                    {% endif %}
+                                    {% if selected_city == city.city_name %}
+                                        selected
+                                    {% endif %}>
+                                    {{ city.city_name }} ({{ city.city_qty_posts }})
+                            </option>
+                        {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="large-3 columns">
+           <div class="large-12 columns">
+                <select required name="category" size="1" class=" radius ">
+                    <option  value="Все категории"
+                            {%if selected_category and  selected_category == "Все категории" %}
+                                            selected
+                            {% elif not selected_category %}
+                                selected
+                            {% endif %}>
+                            Все категории</option>
+                    <option value="Электроника"
+                            {%if selected_category and selected_category == "Электроника" %}
+                                            selected
+                            {% else %}{% endif %}
+                    >Электроника
+                    </option>
+                    <option value="Мода"
+                            {%if selected_category and "Мода" in selected_category %}
+                                            selected
+                            {% else %}{% endif %}
+                            >Мода</option>
+                    <option value="Спорт"
+                            {%if selected_category and "Спорт" in selected_category %}
+                                            selected
+                            {% else %}{% endif %}
+                            >Спорт</option>
+                    <option value="Развлечения"
+                            {%if selected_category and "Развлечения" in selected_category %}
+                                            selected
+                            {% else %}{% endif %}
+                            >Развлечения</option>
+                    <option value="Еда"
+                            {%if selected_category and "Еда" in selected_category %}
+                                            selected
+                            {% else %}{% endif %}
+                            >Еда</option>
+                    <option value="Услуги"
+                            {%if selected_category and "Услуги" in selected_category %}
+                                            selected
+                            {% else %}{% endif %}
+                            >Услуги</option>
+                    <option value="Другое"
+                            {%if selected_category and "Другое" in selected_category %}
+                                            selected
+                            {% else %}{% endif %}
+                            >Другое</option>
+                </select>
+            </div>
+        </div>
+        <div class="large-5 columns">
+                <div class="large-8 columns">
+                  <input value="{{ selected_name_gift }}" maxlength="50" name="name_gift" class="radius" type="text" placeholder="Я хочу найти...">
+                </div>
+                <div class="large-4  columns right">
+                    <input type="submit" class="alert button radius" value="Найти"  >
+                </div>
+        </div>
+        </form>
+    </dl>
+    </div>
+</div>
+{% endblock %}
+
+{% block sub_nav %}
+<div class="row">
+<div class="large-11" >
+    <div class="sub-nav left" style="margin-left: 15%;">Найдено <strong>{{ count }}</strong> конкурс(a/ов)</div>
+    <dl class="sub-nav right" >
+        <dd>
+            Отсортировано:
+        </dd>
+        <dd>
+            <a data-dropdown="drop2" aria-controls="drop2" aria-expanded="false">
+                {% if selected_sort %}
+                    {{selected_sort}}
+                {% else %}
+                    Выбрать..
+                {% endif %}
+            </a>
+            <ul id="drop2" class="f-dropdown content" data-dropdown-content  aria-hidden="true" tabindex="-1" >
+              {% if not selected_sort == "по участникам по возрастанию"%}
+                  <li><a href="/sorted_members_up/">
+                        по участникам по возрастанию
+                  </a></li>
+              {% endif %}
+              {% if not selected_sort == "по участникам по убыванию"%}
+                  <li><a href="/sorted_members_down/">
+                        по участникам по убыванию
+                  </a></li>
+              {% endif %}
+              {% if not selected_sort == "по количеству победителей по возрастанию"%}
+                  <li><a href="/sorted_gifts_up/">
+                        по количеству победителей по возрастанию
+                  </a></li>
+              {% endif %}
+              {% if not selected_sort == "по количеству победителей по убыванию"%}
+                  <li><a href="/sorted_gifts_down/">
+                        по количеству победителей по убыванию
+                  </a></li>
+              {% endif %}
+              {% if not selected_sort == "по дням до завершения по возрастанию"%}
+                  <li><a href="/sorted_days_up/">
+                        по дням до завершения по возрастанию
+                  </a></li>
+              {% endif %}
+              {% if not selected_sort == "по дням до завершения по убыванию"%}
+                  <li><a href="/sorted_days_down/">
+                        по дням до завершения по убыванию
+                  </a></li>
+              {% endif %}
+            </ul>
+        </dd>
+    </dl>
+</div>
+</div>
+{% endblock %}
+
+{% block search %}
+<div class="large-10 columns small-centered" >
+    {% for post in posts %}
+        <hr>
+        <table width="100%" height="200px">
+            <tr>
+            <td style="width: 200px;"><img {% if post.post_img_gift == "" %}
+                                                src = "{% static "static/img/default_img_gift.jpg" %}"
+                                           {% else %}
+                                                src = {{ post.post_img_gift }}
+                                           {% endif %}
+                width = "100%"  alt = "Приз"></td>
+            <td>
+                <table width="100%" >
+                <tr><h5><a href = "{{ post.post_url_post }}" target="_blank">{{ post.post_name_gift|capfirst }}</a></h5></tr>
+                    <tr>
+                        <td width="50%"><h4>
+                            {{ post.post_members }} участников
+                        </h4></td>
+                        {% if "мес" not in post.post_deadline|timeuntil and "день" not in post.post_deadline|timeuntil and "дней" not in post.post_deadline|timeuntil and "нед" not in post.post_deadline|timeuntil%}
+                            <td>Осталось <strong style="color: red;">{{ post.post_deadline|timeuntil }}</strong> <img src="{% static "static/img/flame3.png" %}" width="20px" alt = "Огонь"></td>
+                        {% else %}
+                            <td>Осталось <strong>{{ post.post_deadline|timeuntil }}</strong></td>
+                        {% endif %}
+
+                    </tr>
+                    <tr>
+                        {% if  post.post_qty_gifts < 2 %}
+                            <td><h5>{{ post.post_qty_gifts }} победитель</h5></td>
+                        {% elif 1 < post.post_qty_gifts and post.post_qty_gifts < 5 %}
+                            <td><h5>{{ post.post_qty_gifts }} победителя</h5></td>
+                        {% elif 4 < post.post_qty_gifts and post.post_qty_gifts < 10 %}
+                            <td><h5>{{ post.post_qty_gifts }} победителей</h5></td>
+                        {% else %}
+                            <td><h5>{{ post.post_qty_gifts }} победителей</h5></td>
+                        {% endif %}
+                        <td><h5>
+                            {% if  post.post_city == 'По всей России' %}
+                                {{ post.post_city }}
+                            {% else %}
+                                г. {{ post.post_city }}
+                            {% endif %}
+                            </h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><a  href = "{{ post.post_url_post }}" target="_blank"><img width="60px" src="{% static "static/img/link_3.jpg" %}"></a></td>
+                       <!--class="[success alert secondary] [round radius] label"-->
+                        <td>
+                            {% if post.post_num_claver == 1 %}
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                            {% elif post.post_num_claver == 2 %}
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                            {% elif post.post_num_claver == 3 %}
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                            {% elif post.post_num_claver == 4 %}
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                            {% elif post.post_num_claver == 4 %}
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                            {% elif post.post_num_claver == 5 %}
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                                <img width="25 em" src="{% static "static/img/claver.jpg" %}"  alt = "Клевер">
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tr>
+                </table>
+            </td>
+            </tr>
+        </table>
+    {% endfor %}
+
+<div class="row">
+    {% if posts.object_list and posts.paginator.num_pages > 1 %}
+    <div class="pagination-centered" style="margin-top: 20px; margin-bottom: 20px; ">
+        <span class="step-links">
+            {% if posts.has_previous %}
+                {% if posts.paginator.num_pages > 2 %}
+                    <a href= "/page/1/"><img width="30 em" src="{% static "static/img/bracket_left_2.png" %}"  alt = "Скобка влево"></a>
+                    <a href= "/page/{{ posts.previous_page_number }}/"><img width="20 em" src="{% static "static/img/arrow_left.png" %}"  alt = "Стрелка влево"></a>
+                {% else %}
+                    <a href= "/page/{{ posts.previous_page_number }}/"><img width="20 em" src="{% static "static/img/arrow_left.png" %}"  alt = "Стрелка влево"></a>
+                {% endif %}
+            {% endif %}
+
+            <span class="current">
+                   {{ posts.number }} из {{ posts.paginator.num_pages }}
+            </span>
+            {% if posts.has_next %}
+                {% if posts.paginator.num_pages > 2 %}
+                    <a href="/page/{{ posts.next_page_number }}/"><img width="20 em" src="{% static "static/img/arrow_right.png" %}"  alt = "Стрелка вправо"></a>
+                    <a href="/page/{{ posts.paginator.num_pages }}/"><img width="30 em"  src="{% static "static/img/bracket_right_2.png" %}"  alt = "Скобка влево"></a>
+                {% else %}
+                    <a href="/page/{{ posts.next_page_number }}/"><img width="20 em" src="{% static "static/img/arrow_right.png" %}"  alt = "Стрелка вправо"></a>
+                {% endif %}
+            {% endif %}
+        </span>
+    </div>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+

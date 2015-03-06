@@ -1,0 +1,19 @@
+{% extends 'main.html' %}
+
+
+
+
+
+{% block count %}
+
+<dd >
+    Найдено конкурсов: {{ count }}
+</dd>
+{% endblock %}
+
+
+{% block not_found %}
+<hr>
+<p>По вашему запросу не найдено ни одного конкурса. </p>
+
+{% endblock %}
